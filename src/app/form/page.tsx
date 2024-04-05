@@ -1,5 +1,7 @@
 "use client";
 
+import React, { useState } from "react";
+import axios from "axios";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -30,38 +32,46 @@ export default function Mailform() {
       //   otp: "",
     },
   });
-  // 2. Define a submit handler.
+ 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+   
+    const Home = () => {
+      const [response, setResponse] = useState(null);
 
-    console.log(values);
-    const { email } = values; // Extract email from form values
+      const fetchData = async () => {
+        const url = process.env.NEXT_PUBLIC_BLUEPEN_OTP_VERIFY
 
-    const apiUrl = 'https://bluepen.co.in/api/freelancer/getemailotp.php';
+        const { email } = values;
+        try {
+          const payload = {
+            category: "non_technical",
+            email: email,
+          }; // Your payload data
+          const res = await axios.post(
+            url,
+            payload
+          );
 
-
-    fetch("../app/call", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }), // Pass email in request body
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to send OTP");
+          setResponse(res.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
-        return response.json();
-      })
-      .then((data) => {
-        // Handle successful response
-        console.log("OTP sent successfully:", data);
-      })
-      .catch((error) => {
-        // Handle error
-        console.error("Error sending OTP:", error.message);
-      });
+      };
+
+      // return (
+      //   <div>
+      //     <button onClick={fetchData}>Fetch Data</button>
+      //     {response && (
+      //       <div>
+      //         <h2>Response:</h2>
+      //         <pre>{JSON.stringify(response, null, 2)}</pre>
+      //       </div>
+      //     )}
+      //   </div>
+      // );
+    };
+
+    // export default Home;
   }
 
   // ...
